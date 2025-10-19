@@ -1,0 +1,16 @@
+---
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# clang-format --dump-config
+#
+BasedOnStyle: Chromium
+Language: Cpp
+ColumnLimit: 120
+
+CommentPragmas: "^NOLINT"
+
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: BlockIndent
+# AllowAllArgumentsOnNextLine: true
+# AllowAllConstructorInitializersOnNextLine: true
+# AllowAllParametersOfDeclarationOnNextLine: true
