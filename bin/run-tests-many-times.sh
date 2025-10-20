@@ -15,7 +15,6 @@ cd "${__root}"
 count=500
 for i in $(seq $count); do
     echo "Attempt $i ---------"
-    rm -rf ./demultiplexer_test.log
-    #./build/demultiplexer_test > ./demultiplexer_test.log
-    ./build/demultiplexer_test > /dev/null
+    rm -rf ./io-uring-soup-bin_test.log
+    ./build/io-uring-soup-bin_test > ./io-uring-soup-bin_test.log
 done
