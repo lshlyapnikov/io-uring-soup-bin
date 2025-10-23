@@ -35,7 +35,7 @@ if(CCACHE_PROGRAM)
 endif()
 
 #
-# dependencies
+# Conan dependencies
 #
 
 set(Boost_USE_STATIC_LIBS ON)
@@ -51,6 +51,18 @@ find_package(GTest REQUIRED)
 
 find_package(rapidcheck REQUIRED)
 
+#
+# Linux-specific dependencies
+#
+
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(liburing REQUIRED IMPORTED_TARGET GLOBAL liburing)
+
+if (liburing_FOUND)
+    message(STATUS "Found liburing version ${liburing_VERSION}")
+endif()
+
 # system include directories do not raise compiler warnings
 include_directories(
   SYSTEM ${Boost_INCLUDE_DIR}
@@ -63,11 +75,62 @@ include_directories(
 # artifacts
 #
 
+add_executable(server_example
+  src/example/server_example.cpp
+)
+target_link_libraries(server_example
+  PRIVATE server
+  PRIVATE util
+  PRIVATE hdr_histogram::hdr_histogram_static
+  PRIVATE dl # boost/stacktrace.hpp
+  PRIVATE Boost::log
+)
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    target_link_libraries(server_example PRIVATE profiler)
+endif()
+target_compile_options(server_example
+  PRIVATE ${MY_CXX_FLAGS}
+)
+
+add_executable(client_example
+  src/example/client_example.cpp
+)
+target_link_libraries(client_example
+  PRIVATE client
+  PRIVATE util
+  PRIVATE hdr_histogram::hdr_histogram_static
+  PRIVATE dl # boost/stacktrace.hpp
+  PRIVATE Boost::log
+)
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    target_link_libraries(client_example PRIVATE profiler)
+endif()
+target_compile_options(client_example
+  PRIVATE ${MY_CXX_FLAGS}
+)
+
 add_library(${PROJECT_NAME}
   STATIC
 )
 target_link_libraries(${PROJECT_NAME}
+  PRIVATE server
+  PRIVATE client
   PRIVATE util
+  PRIVATE PkgConfig::liburing
+)
+
+add_library(server
+  OBJECT src/core/server.cpp
+)
+target_compile_options(server
+  PRIVATE ${MY_CXX_FLAGS}
+)
+
+add_library(client
+  OBJECT src/core/client.cpp
+)
+target_compile_options(client
+  PRIVATE ${MY_CXX_FLAGS}
 )
 
 add_library(util
@@ -80,17 +143,46 @@ target_compile_options(util
 enable_testing()
 include(GoogleTest)
 
+add_executable(server_test
+  src/test/server_test.cpp
+)
+target_link_libraries(server_test
+  PRIVATE server
+  PRIVATE util
+  PRIVATE gtest::gtest
+  PRIVATE rapidcheck
+  PRIVATE Boost::log
+)
+target_compile_options(server_test
+  PRIVATE ${MY_CXX_FLAGS}
+)
+gtest_discover_tests(server_test)
+
+add_executable(client_test
+  src/test/client_test.cpp
+)
+target_link_libraries(client_test
+  PRIVATE client
+  PRIVATE util
+  PRIVATE gtest::gtest
+  PRIVATE rapidcheck
+  PRIVATE Boost::log
+)
+target_compile_options(client_test
+  PRIVATE ${MY_CXX_FLAGS}
+)
+gtest_discover_tests(client_test)
+
 # add_executable(${xyz}
 #   src/test/${xyz}.cpp
 # )
 # target_link_libraries(${xyz}
-#   PRIVATE sequencer
-#   PRIVATE shm_util
-#   PRIVATE logging
-#   PRIVATE actor_id
-#   PRIVATE demux-cpp::demux-cpp
+#   PRIVATE server
+#   PRIVATE client
+#   PRIVATE util
 #   PRIVATE gtest::gtest
 #   PRIVATE rapidcheck
+#   PRIVATE Boost::log
 # )
 # target_compile_options(${xyz}
 #   PRIVATE ${MY_CXX_FLAGS}

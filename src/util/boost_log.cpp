@@ -9,7 +9,7 @@
 #include <boost/log/trivial.hpp>
 // NOLINTEND(misc-include-cleaner)
 
-namespace lshl::soup::util {
+namespace lshl::soup_bin::util {
 
 auto get_log_level_from_env() -> boost::log::trivial::severity_level {
   // NOLINTNEXTLINE(concurrency-mt-unsafe)
@@ -38,4 +38,4 @@ auto init_logging() noexcept -> void {
   boost::log::core::get()->set_filter(boost::log::trivial::severity >= get_log_level_from_env());
 }
 
-}  // namespace lshl::soup::util
+}  // namespace lshl::soup_bin::util

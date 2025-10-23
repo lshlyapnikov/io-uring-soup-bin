@@ -5,10 +5,10 @@
 
 #include <boost/log/trivial.hpp>
 
-namespace lshl::soup::util {
+namespace lshl::soup_bin::util {
 
 auto get_log_level_from_env() -> boost::log::trivial::severity_level;
 
 auto init_logging() noexcept -> void;
 
-}  // namespace lshl::soup::util
+}  // namespace lshl::soup_bin::util
