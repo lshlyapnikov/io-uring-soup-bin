@@ -1,7 +1,7 @@
 // Copyright 2024 Leonid Shlyapnikov.
 // SPDX-License-Identifier: Apache-2.0
 
-#include "./boost_log.h"
+#include "./boost_log_init.h"
 #include <cstdlib>
 #include <string>
 // NOLINTBEGIN(misc-include-cleaner)
@@ -11,7 +11,7 @@
 
 namespace lshl::soup_bin::util {
 
-auto get_log_level_from_env() -> boost::log::trivial::severity_level {
+auto get_log_level_from_env() noexcept -> boost::log::trivial::severity_level {
   // NOLINTNEXTLINE(concurrency-mt-unsafe)
   const char* env_p = std::getenv("BOOST_LOG_LEVEL");
   if (env_p != nullptr) {
@@ -33,6 +33,7 @@ auto get_log_level_from_env() -> boost::log::trivial::severity_level {
   return boost::log::trivial::info;  // Default to info if not set
 }
 
+/// @brief Initialize logging with level from environment variable BOOST_LOG_LEVEL. Call it from main function only.
 auto init_logging() noexcept -> void {
   // NOLINTNEXTLINE(misc-include-cleaner)
   boost::log::core::get()->set_filter(boost::log::trivial::severity >= get_log_level_from_env());

@@ -134,7 +134,7 @@ target_compile_options(client
 )
 
 add_library(util
-  OBJECT src/util/boost_log.cpp
+  OBJECT src/util/boost_log_init.cpp
 )
 target_compile_options(util
   PRIVATE ${MY_CXX_FLAGS}
